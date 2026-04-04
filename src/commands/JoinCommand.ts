@@ -1,6 +1,7 @@
 import { entersState, joinVoiceChannel, VoiceConnectionStatus } from "@discordjs/voice";
 import type { Message } from "discord.js";
-import { AudioService } from "../service/AudioService .js";
+import { AudioService } from "../service/AudioService.js";
+import { ObjectStorageService } from "../service/ObjectStorageService.js";
 
 export class JoinCommand {
 
@@ -25,7 +26,7 @@ export class JoinCommand {
             guildId: message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator
         });
-        const audioService = new AudioService();
+        const audioService = new AudioService(new ObjectStorageService());
         try {
             await entersState(connection, VoiceConnectionStatus.Ready, 5000);
 
