@@ -1,9 +1,7 @@
-import {
-    S3Client,
-    GetObjectCommand
-} from "@aws-sdk/client-s3";
-
-import { Readable } from "node:stream";
+import { createWriteStream } from "node:fs";
+import { pipeline } from "node:stream/promises";
+import path from "node:path";
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export class ObjectStorageService {
 
@@ -23,7 +21,7 @@ export class ObjectStorageService {
         });
     }
 
-    public async getObjectStream(key: string): Promise<Readable> {
+    public async downloadToFile(key: string, outputDir: string): Promise<string> {
         const command = new GetObjectCommand({
             Bucket: this.bucket,
             Key: key
@@ -35,6 +33,10 @@ export class ObjectStorageService {
             throw new Error("Empty object body");
         }
 
-        return response.Body as Readable;
+        const filePath = path.join(outputDir, key);
+
+        await pipeline(response.Body as any, createWriteStream(filePath));
+
+        return filePath;
     }
 }

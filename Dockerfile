@@ -35,7 +35,6 @@ COPY --chown=node:node package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder --chown=node:node /app/dist ./dist
-COPY --chown=node:node audios ./audios
 
 ENV NODE_ENV=production
 
