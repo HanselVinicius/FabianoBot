@@ -9,7 +9,12 @@ export class JoinCommand {
     ) { }
 
     public async execute(message: Message) {
-        if (message.content !== "!join") return;
+        if (!message.content.includes("!join")) return;
+        const soundName = message.content.split(' ');
+        if (!soundName[1] || Number(!soundName[1].trim().length) === 0) {
+            await message.reply("You need to specify a sound");
+            return;
+        }
 
         if (!message.guild) return;
 
@@ -17,7 +22,7 @@ export class JoinCommand {
         const channel = member?.voice.channel;
 
         if (!channel) {
-            message.reply("You need to be on a voice channel.");
+            await message.reply("You need to be on a voice channel.");
             return;
         }
 
@@ -29,14 +34,11 @@ export class JoinCommand {
         const audioService = new AudioService(new ObjectStorageService());
         try {
             await entersState(connection, VoiceConnectionStatus.Ready, 5000);
-
-            audioService.play(connection, "sound");
-
+            audioService.play(connection, String(soundName[1].trim()));
         } catch (error) {
-            console.error("Error:", error);
+            await message.reply("I didnt have this sound here broo");
             connection.destroy();
         }
-
     }
 
 }

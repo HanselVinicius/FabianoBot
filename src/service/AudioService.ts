@@ -23,7 +23,6 @@ export class AudioService {
   }
 
   public async play(connection: VoiceConnection, soundName: string) {
-
     const key = `${soundName}.mp3`;
 
     const filePath = await this.storage.downloadToFile(key, this.basePath);

@@ -22,21 +22,26 @@ export class ObjectStorageService {
     }
 
     public async downloadToFile(key: string, outputDir: string): Promise<string> {
-        const command = new GetObjectCommand({
-            Bucket: this.bucket,
-            Key: key
-        });
+        try {
+            const command = new GetObjectCommand({
+                Bucket: this.bucket,
+                Key: key
+            });
 
-        const response = await this.client.send(command);
+            const response = await this.client.send(command);
 
-        if (!response.Body) {
-            throw new Error("Empty object body");
+            if (!response.Body) {
+                throw new Error("Empty object body");
+            }
+
+            const filePath = path.join(outputDir, key);
+
+            await pipeline(response.Body as any, createWriteStream(filePath));
+
+            return filePath;
+        } catch (err) {
+            console.error('error trying to download object with key: ', key);
+            throw err;
         }
-
-        const filePath = path.join(outputDir, key);
-
-        await pipeline(response.Body as any, createWriteStream(filePath));
-
-        return filePath;
     }
 }
