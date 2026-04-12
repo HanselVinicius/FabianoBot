@@ -11,7 +11,7 @@ export class JoinCommand {
     public async execute(message: Message) {
         if (!message.content.includes("!join")) return;
         const soundName = message.content.split(' ');
-        if (!soundName[1] || Number(!soundName[1].trim().length) === 0) {
+        if (!soundName[1] || !soundName[1].trim().length) {
             await message.reply("You need to specify a sound");
             return;
         }
