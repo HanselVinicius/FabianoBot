@@ -34,7 +34,7 @@ export class JoinCommand {
         const audioService = new AudioService(new ObjectStorageService());
         try {
             await entersState(connection, VoiceConnectionStatus.Ready, 5000);
-            audioService.play(connection, String(soundName[1].trim()));
+            await audioService.play(connection, String(soundName[1].trim()));
         } catch (error) {
             await message.reply("I didnt have this sound here broo");
             connection.destroy();
