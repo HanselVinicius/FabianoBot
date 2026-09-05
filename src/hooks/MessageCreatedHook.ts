@@ -1,5 +1,6 @@
 import type { Client, Message } from "discord.js";
 import { JoinCommand } from "../commands/JoinCommand.js";
+import { CallBroosCommand } from "../commands/CallBroosCommand.js";
 
 export class MessageCreatedHook {
 
@@ -10,6 +11,7 @@ export class MessageCreatedHook {
     async execute() {
         this.client.on("messageCreate", async (message: Message) => {
             new JoinCommand().execute(message);
+            new CallBroosCommand().execute(message);
         });
     }
 

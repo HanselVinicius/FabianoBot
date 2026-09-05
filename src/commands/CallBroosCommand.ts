@@ -1,0 +1,26 @@
+
+import type { Message } from "discord.js";
+
+export class CallBroosCommand {
+
+    public async execute(message: Message) {
+        if (!message.content.includes("!call")) return;
+        const args = message.content.slice("!call".length).trim().split(/ +/g);
+        await this.callBroos(message, args);
+    }
+
+    private async callBroos(message: Message, args: string[]) {
+        const url = `http://localhost:3000/whatsapp`;
+        fetch(url,{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": process.env.NOCTIS_API_KEY || ""
+            },
+            body: JSON.stringify({ 
+                message: `CHAMADO PARA O DISCORD MENSAGEM: ${args.join(", ")}`,
+             })
+        });
+        await message.reply(`Calling Broos with args: ${args.join(", ")}`);
+    }
+}
