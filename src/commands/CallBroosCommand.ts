@@ -10,8 +10,8 @@ export class CallBroosCommand {
     }
 
     private async callBroos(message: Message, args: string[]) {
-        const url = `http://localhost:3000/whatsapp`;
-        fetch(url,{
+        const url = process.env.NOCTIS_API_URL || "http://localhost:3000/api/whatsapp/call";
+        await fetch(url,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
