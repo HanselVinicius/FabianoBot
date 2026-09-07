@@ -22,7 +22,8 @@ export class CallBroosCommand {
                     message: `CHAMADO PARA O DISCORD MENSAGEM: ${args.join(", ")}`,
                 })
             });
-            if (res.status !== 201) {
+            console.log(`Response from Broos API: ${res.status} ${res.statusText}`);
+            if (res.status !== 200) {
                 await message.reply("Failed to call Broos. Please try again later.");
                 return;
             }
