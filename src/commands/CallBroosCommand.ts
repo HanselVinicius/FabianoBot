@@ -22,7 +22,10 @@ export class CallBroosCommand {
                     message: `CHAMADO PARA O DISCORD MENSAGEM: ${args.join(", ")}`,
                 })
             });
-            console.log(`Broos API response: ${res.status} ${res}`);
+            if (res.status % 200 !== 0) {
+                await message.reply("Failed to call Broos. Please try again later.");
+                return;
+            }
             await message.reply(`Calling Broos with args: ${args.join(", ")}`);
         } catch (error) {
             await message.reply("Failed to call Broos. Please try again later.");
