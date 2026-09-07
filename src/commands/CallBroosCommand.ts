@@ -22,7 +22,7 @@ export class CallBroosCommand {
                     message: `CHAMADO PARA O DISCORD MENSAGEM: ${args.join(", ")}`,
                 })
             });
-            if (res.status % 200 !== 0) {
+            if (res.status !== 201) {
                 await message.reply("Failed to call Broos. Please try again later.");
                 return;
             }
