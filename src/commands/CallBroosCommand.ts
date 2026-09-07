@@ -12,7 +12,7 @@ export class CallBroosCommand {
     private async callBroos(message: Message, args: string[]) {
         try {
             const url = process.env.NOCTIS_API_URL || "http://localhost:3000/api/whatsapp/call";
-            await fetch(url, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -22,6 +22,7 @@ export class CallBroosCommand {
                     message: `CHAMADO PARA O DISCORD MENSAGEM: ${args.join(", ")}`,
                 })
             });
+            console.log(`Broos API response: ${res.status} ${res}`);
             await message.reply(`Calling Broos with args: ${args.join(", ")}`);
         } catch (error) {
             await message.reply("Failed to call Broos. Please try again later.");
