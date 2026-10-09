@@ -8,8 +8,10 @@ export class SoundDownloaderService {
             dumpSingleJson: true,
             noWarnings: true,
             noCheckCertificates: true,
+            retries: process.env.YOUTUBE_DL_RETRIES ? parseInt(process.env.YOUTUBE_DL_RETRIES) : 3,
+            fragmentRetries: process.env.YOUTUBE_DL_RETRIES ? parseInt(process.env.YOUTUBE_DL_RETRIES) : 3,
         });
-        if(output === null || typeof output !== "object") {
+        if (output === null || typeof output !== "object") {
             return null
         }
         return {
@@ -26,6 +28,8 @@ export class SoundDownloaderService {
             audioFormat: "mp3",
             output: outputPath,
             noWarnings: true,
+            retries: process.env.YOUTUBE_DL_RETRIES ? parseInt(process.env.YOUTUBE_DL_RETRIES) : 3,
+            fragmentRetries: process.env.YOUTUBE_DL_RETRIES ? parseInt(process.env.YOUTUBE_DL_RETRIES) : 3,
         });
     }
 }

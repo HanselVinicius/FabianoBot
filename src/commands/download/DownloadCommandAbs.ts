@@ -15,7 +15,7 @@ export abstract class DownloadCommandAbs {
         return await this.soundService.getVideoMetadata(soundUrl);
     }
 
-    protected getOutputPath():string{
+    protected getOutputPath(): string {
         return path.join(process.env.TMPDIR || "/tmp", `${randomUUID()}.mp3`);
     }
 
@@ -23,7 +23,15 @@ export abstract class DownloadCommandAbs {
         await this.soundService.downloadAudio(soundUrl!!, outputPath);
     }
 
-protected validateInput(args: string[]): string | null {
+    protected getSoundUrl(input: string): string {
+        const urlObj = new URL(input);
+        urlObj.searchParams.delete('list');
+        urlObj.searchParams.delete('start_radio');
+        urlObj.searchParams.delete('index');
+        return urlObj.toString();
+    }
+
+    protected validateInput(args: string[]): string | null {
         if (args.length === 0) {
             return "You need to specify a sound to download.";
         }

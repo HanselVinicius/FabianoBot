@@ -22,7 +22,7 @@ export class DownloadSoundCommand extends DownloadCommandAbs {
                 return;
             }
 
-            const soundUrl = args[0];
+            const soundUrl = this.getSoundUrl(args[0]!!);
 
             const metadataMsg = await message.reply("Fetching video info...");
             const metadata = await this.getVideoMetadata(soundUrl!!);
