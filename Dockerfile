@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --chown=node:node package*.json ./
 RUN npm ci --omit=dev
+
 COPY --from=builder --chown=node:node /app/dist ./dist
 RUN mkdir -p /app/audios && chown node:node /app/audios
 
