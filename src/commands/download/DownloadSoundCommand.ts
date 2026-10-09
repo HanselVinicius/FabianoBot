@@ -1,6 +1,4 @@
-import { randomUUID } from "crypto";
 import { Message } from "discord.js";
-import path from "path";
 import fs from "fs";
 import { DownloadCommandAbs } from "./DownloadCommandAbs.js";
 
@@ -27,7 +25,7 @@ export class DownloadSoundCommand extends DownloadCommandAbs {
             const soundUrl = args[0];
 
             const metadataMsg = await message.reply("Fetching video info...");
-            const metadata = await this.soundService.getVideoMetadata(soundUrl!!);
+            const metadata = await this.getVideoMetadata(soundUrl!!);
 
             const videoError = this.validateVideo(metadata);
             if (videoError) {
@@ -39,10 +37,9 @@ export class DownloadSoundCommand extends DownloadCommandAbs {
             await metadataMsg.delete().catch(() => { });
             downloadingMsg = await message.reply(`Downloading **${metadata!!.title}**, please wait...`);
 
-            const fileName = `${randomUUID()}.mp3`;
-            outputPath = path.join(process.env.TMPDIR || "/tmp", fileName);
+            outputPath = this.getOutputPath();
 
-            await this.soundService.downloadAudio(soundUrl!!, outputPath);
+            await this.downloadAudio(soundUrl!!, outputPath);
 
             await message.reply({
                 files: [outputPath],
