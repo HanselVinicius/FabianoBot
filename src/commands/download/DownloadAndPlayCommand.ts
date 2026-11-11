@@ -103,13 +103,23 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
     }
 
     private registerConnectionHooks(connection: VoiceConnection) {
-        connection.on(VoiceConnectionStatus.Disconnected, () => {
-            console.log("Someone disconnected me from the voice channel. Gracefully leaving the channel.");
-            DownloadAndPlayCommand.isProcessing = false;
+        connection.on(VoiceConnectionStatus.Disconnected, async () => {
+            try {
+                await Promise.race([
+                    entersState(connection, VoiceConnectionStatus.Signalling, 2000),
+                    entersState(connection, VoiceConnectionStatus.Connecting, 2000),
+                ]);
+            } catch (error) {
+                console.log("Real disconnect detected. Cleaning up...");
+                DownloadAndPlayCommand.isProcessing = false;
+                
+                if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
+                    connection.destroy();
+                }
+            }
         });
 
         connection.on(VoiceConnectionStatus.Destroyed, () => {
-            console.log("Voice connection destroyed. Resetting processing state.");
             DownloadAndPlayCommand.isProcessing = false;
         });
     }
