@@ -102,7 +102,19 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
         }
     }
 
-    private registerConnectionHooks(connection: VoiceConnection) {
+    private registerConnectionHooks(connection: VoiceConnection, outputPath?: string) {
+
+        const cleanupFile = () => {
+            if (outputPath && fs.existsSync(outputPath)) {
+                try {
+                    fs.unlinkSync(outputPath);
+                    console.log(`[Disconnect Hook] File deleted: ${outputPath}`);
+                } catch (e) {
+                    console.error(`Error occurred while trying to delete the file in the hook:`, e);
+                }
+            }
+        };
+
         connection.on(VoiceConnectionStatus.Disconnected, async () => {
             try {
                 await Promise.race([
@@ -112,7 +124,9 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
             } catch (error) {
                 console.log("Real disconnect detected. Cleaning up...");
                 DownloadAndPlayCommand.isProcessing = false;
-                
+
+                cleanupFile();
+
                 if (connection.state.status !== VoiceConnectionStatus.Destroyed) {
                     connection.destroy();
                 }
@@ -121,6 +135,7 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
 
         connection.on(VoiceConnectionStatus.Destroyed, () => {
             DownloadAndPlayCommand.isProcessing = false;
+            cleanupFile();
         });
     }
 }
