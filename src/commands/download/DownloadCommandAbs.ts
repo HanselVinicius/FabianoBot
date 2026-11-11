@@ -23,34 +23,29 @@ export abstract class DownloadCommandAbs {
         await this.soundService.downloadAudio(soundUrl!!, outputPath);
     }
 
-    protected getSoundUrl(input: string): string {
-        const urlObj = new URL(input);
-        urlObj.searchParams.delete('list');
-        urlObj.searchParams.delete('start_radio');
-        urlObj.searchParams.delete('index');
-        return urlObj.toString();
+    protected getTarget(args: string[]): string {
+        const input = args.join(" ").trim();
+        const urlRegex = /^(?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b/i;
+
+        if (urlRegex.test(input)) {
+            try {
+                const urlObj = new URL(input.startsWith('http') ? input : `https://${input}`);
+                urlObj.searchParams.delete('list');
+                urlObj.searchParams.delete('start_radio');
+                urlObj.searchParams.delete('index');
+                return urlObj.toString();
+            } catch {
+                return input;
+            }
+        }
+
+        return `ytsearch1:${input}`;
     }
 
     protected validateInput(args: string[]): string | null {
         if (args.length === 0) {
-            return "You need to specify a sound to download.";
+            return "You need to specify a sound URL or name to download.";
         }
-
-        const soundUrl = args[0];
-        if (!soundUrl) {
-            return "You need to provide a valid sound URL.";
-        }
-
-        const urlRegex = /^(?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/i;
-        if (!urlRegex.test(soundUrl)) {
-            return "The provided sound URL is not valid. Please provide a valid URL.";
-        }
-
-        const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\//i;
-        if (!youtubeRegex.test(soundUrl)) {
-            return "Currently, only YouTube URLs are supported. Please provide a valid YouTube link.";
-        }
-
         return null;
     }
 

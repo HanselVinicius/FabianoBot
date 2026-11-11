@@ -22,10 +22,10 @@ export class DownloadSoundCommand extends DownloadCommandAbs {
                 return;
             }
 
-            const soundUrl = this.getSoundUrl(args[0]!!);
+            const target = this.getTarget(args);
 
             const metadataMsg = await message.reply("Fetching video info...");
-            const metadata = await this.getVideoMetadata(soundUrl!!);
+            const metadata = await this.getVideoMetadata(target!!);
 
             const videoError = this.validateVideo(metadata);
             if (videoError) {
@@ -39,7 +39,7 @@ export class DownloadSoundCommand extends DownloadCommandAbs {
 
             outputPath = this.getOutputPath();
 
-            await this.downloadAudio(soundUrl!!, outputPath);
+            await this.downloadAudio(target!!, outputPath);
 
             await message.reply({
                 files: [outputPath],

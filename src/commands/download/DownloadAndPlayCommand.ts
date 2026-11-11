@@ -1,12 +1,12 @@
 import type { Message } from "discord.js";
 import { DownloadCommandAbs } from "./DownloadCommandAbs.js";
 import fs from "fs";
-import { entersState, joinVoiceChannel, VoiceConnectionStatus, getVoiceConnection } from "@discordjs/voice";
+import { entersState, joinVoiceChannel, VoiceConnectionStatus, getVoiceConnection, VoiceConnection } from "@discordjs/voice";
 import { LocalAudioService } from "../../service/LocalAudioService.js";
 
 export class DownloadAndPlayCommand extends DownloadCommandAbs {
     private localAudioService: LocalAudioService;
-    
+
     private static isProcessing = false;
 
     constructor() {
@@ -54,23 +54,23 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
                 return;
             }
 
-            const soundUrl = this.getSoundUrl(args[0]!!);
+            const target = this.getTarget(args);
 
             const metadataMsg = await message.reply("Fetching video info...");
-            const metadata = await this.getVideoMetadata(soundUrl!!);
+            const metadata = await this.getVideoMetadata(target);
 
             const videoError = this.validateVideo(metadata);
             if (videoError) {
                 await metadataMsg.delete().catch(() => { });
                 await message.reply(videoError);
-                return; 
+                return;
             }
 
             await metadataMsg.delete().catch(() => { });
             downloadingMsg = await message.reply(`Downloading **${metadata!.title}**, please wait...`);
 
             outputPath = this.getOutputPath();
-            await this.downloadAudio(soundUrl!!, outputPath);
+            await this.downloadAudio(target, outputPath);
 
             await downloadingMsg.edit(`Playing **${metadata!.title}**...`);
 
@@ -79,6 +79,8 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
                 guildId: message.guild.id,
                 adapterCreator: message.guild.voiceAdapterCreator
             });
+
+            this.registerConnectionHooks(connection);
 
             await entersState(connection, VoiceConnectionStatus.Ready, 5000);
 
@@ -98,5 +100,17 @@ export class DownloadAndPlayCommand extends DownloadCommandAbs {
                 await downloadingMsg.delete().catch(() => { });
             }
         }
+    }
+
+    private registerConnectionHooks(connection: VoiceConnection) {
+        connection.on(VoiceConnectionStatus.Disconnected, () => {
+            console.log("Someone disconnected me from the voice channel. Gracefully leaving the channel.");
+            DownloadAndPlayCommand.isProcessing = false;
+        });
+
+        connection.on(VoiceConnectionStatus.Destroyed, () => {
+            console.log("Voice connection destroyed. Resetting processing state.");
+            DownloadAndPlayCommand.isProcessing = false;
+        });
     }
 }
